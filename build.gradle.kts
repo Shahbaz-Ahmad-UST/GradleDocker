@@ -1,9 +1,9 @@
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 
-        plugins {
-            java
-        }
+plugins {
+    java
+}
 
 group = "com.ust.sdet"
 version = "0.1.0"
@@ -108,18 +108,23 @@ val CatalogPomTest by tasks.registering(Test::class) {
     maxParallelForks = 1
 }
 
-val OrderTest by tasks.registering(Test::class) {
+//val OrderTest by tasks.registering(Test::class) {
+//
+//    description = "Runs OrderTest"
+//    group = "verification"
+//
+//    useProjectTestClasses()
+//
+//    include("**/OrderTest.class")
+//
+//    maxParallelForks = 1
+//}
 
-    description = "Runs OrderTest"
+val orderSuite by tasks.registering {
+    description = "Runs Exercise1-3 and Milestone tests"
     group = "verification"
-
-    useProjectTestClasses()
-
-    include("**/OrderTest.class")
-
-    maxParallelForks = 1
+    dependsOn(exercise1Test, exercise2Test, exercise3Test, milestoneTest)
 }
-
 val exercise1Test by tasks.registering(Test::class) {
     description = "Runs Exercise1Test"
     group = "verification"

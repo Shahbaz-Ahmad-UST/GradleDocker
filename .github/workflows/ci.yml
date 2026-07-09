@@ -42,8 +42,8 @@ jobs:
       - name: Grant Execute Permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run OrderTest
-        run: ./gradlew OrderTest --info
+      - name: Run Order Test Suite
+        run: ./gradlew exercise1Test exercise2Test exercise3Test milestoneTest --info
         env:
           JAVA_TOOL_OPTIONS: >
             -DDB_JDBC_URL=jdbc:mysql://localhost:3306/orders_db
