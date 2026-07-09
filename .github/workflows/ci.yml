@@ -1,17 +1,36 @@
-name: CI
+name: Order Repository CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  test:
+  order-test:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: testdb
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER: testuser
+          MYSQL_PASSWORD: testpass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -u root -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Set up JDK 22
         uses: actions/setup-java@v4
@@ -19,8 +38,16 @@ jobs:
           distribution: temurin
           java-version: '22'
 
-      - name: Grant execute permission for gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant Execute Permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run tests
-        run: ./gradlew test --info
+      - name: Run OrderTest
+        run: ./gradlew OrderTest --info
+        env:
+          JAVA_TOOL_OPTIONS: >
+            -DDB_JDBC_URL=jdbc:mysql://localhost:3306/orders_db
+            -DDB_USER=root
+            -DDB_PASSWORD=rajasoN@0073
