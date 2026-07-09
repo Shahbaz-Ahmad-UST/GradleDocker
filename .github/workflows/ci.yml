@@ -16,14 +16,12 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_DATABASE: root
+          MYSQL_DATABASE: orders_db
           MYSQL_ROOT_PASSWORD: rajasoN@0073
-          MYSQL_USER: orders_db
-          MYSQL_PASSWORD: rajasoN@0073
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -u root -proot"
+          --health-cmd="mysqladmin ping -h localhost -u root -prajasoN@0073"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
