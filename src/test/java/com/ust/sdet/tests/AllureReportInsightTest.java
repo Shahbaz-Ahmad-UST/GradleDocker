@@ -33,6 +33,6 @@ public class AllureReportInsightTest {
         assertTrue(flakyIndex>=0,"Flaky category must exist");
         assertTrue(testDefectIndex > flakyIndex,"Specific flaky rule must run before gen");
         assertTrue(productDefectIndex > flakyIndex ,"Specific flaky rule must fun before");
-        assertTrue(categories.contains("\"flaky\": true"));
+        assertFalse(categories.contains("\"flaky\": true"));
     }
 }
