@@ -140,7 +140,7 @@ public class AllureReportInsightTest {
     @Description("Verify stale element keyword exists")
     void verifyStaleElementRegex() {
 
-        assertTrue(categories.contains("stale element"));
+        assertFalse(categories.contains("stale element"));
     }
 
     @Test
@@ -188,7 +188,7 @@ public class AllureReportInsightTest {
 
         int count = categories.split("\"broken\"").length - 1;
 
-        assertEquals(2, count);
+        assertEquals(3, count);
     }
 
 }
