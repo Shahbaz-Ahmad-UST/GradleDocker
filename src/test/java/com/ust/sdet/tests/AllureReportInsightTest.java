@@ -21,6 +21,17 @@ public class AllureReportInsightTest {
         return Files.readString(Path.of("src/test/resources/allure/categories.json"));
     }
 
+    private String extractBlock(String categories, String nameLiteral) {
+        int blockStart = categories.indexOf(nameLiteral);
+        assertTrue(blockStart >= 0, "Category not found: " + nameLiteral);
+
+        int matchedStatusesIndex = categories.indexOf("\"matchedStatuses\"", blockStart);
+        assertTrue(matchedStatusesIndex >= 0, "matchedStatuses not found for: " + nameLiteral);
+
+        int blockEnd = categories.indexOf("}", matchedStatusesIndex);
+        return categories.substring(blockStart, blockEnd);
+    }
+
     @Test
     @Story("Categories")
     @Severity(SeverityLevel.CRITICAL)
@@ -43,14 +54,10 @@ public class AllureReportInsightTest {
     @Severity(SeverityLevel.NORMAL)
     @Description("Flaky category matches both failed and broken statuses")
     void flakyCategoryMatchesFailedAndBroken() throws IOException {
-        String categories = categories();
+        String block = extractBlock(categories(), "\"Flaky tests\"");
 
-        int flakyBlockStart = categories.indexOf("\"Flaky tests\"");
-        int flakyBlockEnd = categories.indexOf("}", categories.indexOf("\"flaky\": true"));
-        String flakyBlock = categories.substring(flakyBlockStart, flakyBlockEnd);
-
-        assertTrue(flakyBlock.contains("\"failed\""), "Flaky category must match failed status");
-        assertTrue(flakyBlock.contains("\"broken\""), "Flaky category must match broken status");
+        assertTrue(block.contains("\"failed\""), "Flaky category must match failed status");
+        assertTrue(block.contains("\"broken\""), "Flaky category must match broken status");
     }
 
     @Test
@@ -58,16 +65,22 @@ public class AllureReportInsightTest {
     @Severity(SeverityLevel.NORMAL)
     @Description("Flaky category has a messageRegex covering timeout, stale element, and connection reset")
     void flakyCategoryHasExpectedMessageRegex() throws IOException {
-        String categories = categories();
+        String block = extractBlock(categories(), "\"Flaky tests\"");
 
-        int flakyBlockStart = categories.indexOf("\"Flaky tests\"");
-        int flakyBlockEnd = categories.indexOf("}", categories.indexOf("\"flaky\": true"));
-        String flakyBlock = categories.substring(flakyBlockStart, flakyBlockEnd);
+        assertTrue(block.contains("\"messageRegex\""), "Flaky category must define a messageRegex");
+        assertTrue(block.contains("timeout"), "messageRegex must cover timeout");
+        assertTrue(block.contains("stale element"), "messageRegex must cover stale element");
+        assertTrue(block.contains("connection reset"), "messageRegex must cover connection reset");
+    }
 
-        assertTrue(flakyBlock.contains("\"messageRegex\""), "Flaky category must define a messageRegex");
-        assertTrue(flakyBlock.contains("timeout"), "messageRegex must cover timeout");
-        assertTrue(flakyBlock.contains("stale element"), "messageRegex must cover stale element");
-        assertTrue(flakyBlock.contains("connection reset"), "messageRegex must cover connection reset");
+    @Test
+    @Story("Categories")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Flaky category is explicitly flagged flaky true")
+    void flakyCategoryIsFlaggedFlakyTrue() throws IOException {
+        String block = extractBlock(categories(), "\"Flaky tests\"");
+
+        assertTrue(block.contains("\"flaky\": true"), "Flaky category must set flaky: true");
     }
 
     @Test
@@ -75,15 +88,11 @@ public class AllureReportInsightTest {
     @Severity(SeverityLevel.NORMAL)
     @Description("Test defects category matches only broken status")
     void testDefectsCategoryMatchesOnlyBroken() throws IOException {
-        String categories = categories();
+        String block = extractBlock(categories(), "\"Test defects {broken}\"");
 
-        int blockStart = categories.indexOf("\"Test defects {broken}\"");
-        int blockEnd = categories.indexOf("}", blockStart);
-        String block = categories.substring(blockStart, blockEnd);
-
-        assertTrue(block.contains("\"matchedStatuses\""), "Test defects category must define matchedStatuses");
         assertTrue(block.contains("\"broken\""), "Test defects category must match broken");
         assertFalse(block.contains("\"failed\""), "Test defects category must not also match failed");
+        assertFalse(block.contains("\"flaky\": true"), "Test defects category must not be flagged flaky");
     }
 
     @Test
@@ -91,15 +100,11 @@ public class AllureReportInsightTest {
     @Severity(SeverityLevel.NORMAL)
     @Description("Product defects category matches only failed status")
     void productDefectsCategoryMatchesOnlyFailed() throws IOException {
-        String categories = categories();
+        String block = extractBlock(categories(), "\"Product defects\"");
 
-        int blockStart = categories.indexOf("\"Product defects\"");
-        int blockEnd = categories.indexOf("}", blockStart);
-        String block = categories.substring(blockStart, blockEnd);
-
-        assertTrue(block.contains("\"matchedStatuses\""), "Product defects category must define matchedStatuses");
         assertTrue(block.contains("\"failed\""), "Product defects category must match failed");
         assertFalse(block.contains("\"broken\""), "Product defects category must not also match broken");
+        assertFalse(block.contains("\"flaky\": true"), "Product defects category must not be flagged flaky");
     }
 
     @Test
