@@ -3,8 +3,21 @@ import org.gradle.api.tasks.testing.Test
 
 plugins {
     java
+    id("io.qameta.allure") version "2.12.0"
 }
+allure {
+    version.set("2.33.0")
 
+    adapter {
+        aspectjWeaver.set(false)
+
+        frameworks {
+            junit5 {
+                adapterVersion.set("2.33.0")
+            }
+        }
+    }
+}
 group = "com.ust.sdet"
 version = "0.1.0"
 
@@ -47,6 +60,7 @@ dependencies {
     testImplementation("io.cucumber:cucumber-picocontainer")
 
     testImplementation("io.qameta.allure:allure-cucumber7-jvm")
+    testImplementation("io.qameta.allure:allure-junit5")
 
     testImplementation("com.aventstack:extentreports:$extentVersion")
     testImplementation("tech.grasshopper:extentreports-cucumber7-adapter:$extentCucumberAdapterVersion")
@@ -64,6 +78,7 @@ dependencies {
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
+    options.release.set(22)
 }
 
 fun Test.useProjectTestClasses() {
@@ -162,5 +177,15 @@ val milestoneTest by tasks.registering(Test::class) {
     useProjectTestClasses()
 
     include("**/MilestoneTest.class")
+    maxParallelForks = 1
+}
+
+val allureReportInsightTest by tasks.registering(Test::class) {
+    description = "Runs AllureReportInsightTest"
+    group = "verification"
+
+    useProjectTestClasses()
+
+    include("**/AllureReportInsightTest.class")
     maxParallelForks = 1
 }
