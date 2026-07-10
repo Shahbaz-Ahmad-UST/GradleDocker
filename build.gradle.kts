@@ -110,7 +110,7 @@ val orderSuite by tasks.registering(Test::class) {
     description = "Runs Exercise1-3 and Milestone tests together"
     group = "verification"
     useProjectTestClasses()
-    include("**/Exercise1Test.class", "**/Exercise2Test.class", "**/Exercise3Test.class", "**/MilestoneTest.class")
+    include("**/Exercise1Test.class", "**/Exercise2Test.class", "**/Exercise3Test.class", "**/MilestoneTest.class","**/AllureReportInsightTest.class")
     maxParallelForks = 1
 }
 
