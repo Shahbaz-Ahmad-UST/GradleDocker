@@ -81,6 +81,10 @@ jobs:
           keep_reports: 20
           gh_pages: gh-pages
 
+      - name: Remove nested .git left inside allure-history
+        if: always()
+        run: sudo rm -rf allure-history/.git
+
       - name: Verify Allure history was populated
         run: |
           if [ ! -d allure-history ] || [ -z "$(ls -A allure-history 2>/dev/null)" ]; then
