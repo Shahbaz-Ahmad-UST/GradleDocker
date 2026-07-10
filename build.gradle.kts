@@ -3,7 +3,6 @@ import org.gradle.api.tasks.testing.Test
 
 plugins {
     java
-    id("io.qameta.allure") version "2.12.0"
 }
 
 group = "com.ust.sdet"
