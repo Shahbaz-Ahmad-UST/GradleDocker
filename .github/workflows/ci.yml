@@ -46,7 +46,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Order Test Suite
-        run: ./gradlew exercise1Test exercise2Test exercise3Test milestoneTest allureReportInsightTest --info
+        run: ./gradlew orderSuite --info
         continue-on-error: true
         env:
           JAVA_TOOL_OPTIONS: >
