@@ -2,6 +2,7 @@ package com.ust.sdet.tests;
 
 import com.ust.sdet.config.DatabaseConfig;
 import com.ust.sdet.factory.OrderFactory;
+import com.ust.sdet.report.ExtentTestListener;
 import com.ust.sdet.repository.OrderRepository;
 import com.ust.sdet.support.DbSupport;
 import com.ust.sdet.support.TestEnvironment;
@@ -9,8 +10,10 @@ import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.containers.MySQLContainer;
 
+@ExtendWith(ExtentTestListener.class)
 public abstract class AbstractOrderTest {
 
     static MySQLContainer<?> mysql;

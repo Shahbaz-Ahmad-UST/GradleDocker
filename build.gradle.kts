@@ -5,19 +5,7 @@ plugins {
     java
     id("io.qameta.allure") version "2.12.0"
 }
-allure {
-    version.set("2.33.0")
 
-    adapter {
-        aspectjWeaver.set(false)
-
-        frameworks {
-            junit5 {
-                adapterVersion.set("2.33.0")
-            }
-        }
-    }
-}
 group = "com.ust.sdet"
 version = "0.1.0"
 
@@ -90,9 +78,12 @@ tasks.withType<Test>().configureEach {
 
     useJUnitPlatform()
 
+    maxParallelForks = 1
+
     systemProperty("baseUrl", System.getProperty("baseUrl", "http://localhost:5173"))
     systemProperty("headless", System.getProperty("headless", "false"))
     systemProperty("build.label", System.getProperty("build.label", "local"))
+    systemProperty("allure.results.directory", System.getProperty("allure.results.directory", "build/allure-results"))
 
     testLogging {
         events("passed", "skipped", "failed")
@@ -102,13 +93,6 @@ tasks.withType<Test>().configureEach {
 tasks.test {
     description = "Runs all tests."
     group = "verification"
-    maxParallelForks = 4
-}
-
-tasks.test {
-    description = "Runs all tests."
-    group = "verification"
-    maxParallelForks = 4
 }
 
 val CatalogPomTest by tasks.registering(Test::class) {
@@ -123,23 +107,14 @@ val CatalogPomTest by tasks.registering(Test::class) {
     maxParallelForks = 1
 }
 
-//val OrderTest by tasks.registering(Test::class) {
-//
-//    description = "Runs OrderTest"
-//    group = "verification"
-//
-//    useProjectTestClasses()
-//
-//    include("**/OrderTest.class")
-//
-//    maxParallelForks = 1
-//}
-
-val orderSuite by tasks.registering {
-    description = "Runs Exercise1-3 and Milestone tests"
+val orderSuite by tasks.registering(Test::class) {
+    description = "Runs Exercise1-3 and Milestone tests together"
     group = "verification"
-    dependsOn(exercise1Test, exercise2Test, exercise3Test, milestoneTest)
+    useProjectTestClasses()
+    include("**/Exercise1Test.class", "**/Exercise2Test.class", "**/Exercise3Test.class", "**/MilestoneTest.class")
+    maxParallelForks = 1
 }
+
 val exercise1Test by tasks.registering(Test::class) {
     description = "Runs Exercise1Test"
     group = "verification"
