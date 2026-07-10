@@ -110,7 +110,7 @@ val orderSuite by tasks.registering(Test::class) {
     description = "Runs Exercise1-3 and Milestone tests together"
     group = "verification"
     useProjectTestClasses()
-    include("**/Exercise1Test.class", "**/Exercise2Test.class", "**/Exercise3Test.class", "**/MilestoneTest.class","**/AllureReportInsightTest.class")
+    include("**/Exercise1Test.class", "**/Exercise2Test.class", "**/Exercise3Test.class", "**/MilestoneTest.class","**/AllureReportInsightTest.class","**/CategoryDemonstrationTest.class")
     maxParallelForks = 1
 }
 
@@ -162,4 +162,15 @@ val allureReportInsightTest by tasks.registering(Test::class) {
 
     include("**/AllureReportInsightTest.class")
     maxParallelForks = 1
+}
+
+val categoryDemonstrationTest by tasks.registering(Test::class) {
+    description = "Runs CategoryDemonstrationTest (intentionally failing, for Allure report demo only)"
+    group = "verification"
+
+    useProjectTestClasses()
+
+    include("**/CategoryDemonstrationTest.class")
+    maxParallelForks = 1
+    ignoreFailures = true
 }
