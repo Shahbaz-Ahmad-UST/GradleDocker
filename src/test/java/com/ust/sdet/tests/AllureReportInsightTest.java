@@ -10,8 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Epic("Framework Hardening")
 @Feature("Reporting Insights")
@@ -35,6 +34,20 @@ public class AllureReportInsightTest {
         assertTrue(testDefectIndex > flakyIndex,"Specific flaky rule must run before gen");
         assertTrue(productDefectIndex > flakyIndex ,"Specific flaky rule must fun before");
         assertTrue(categories.contains("\"flaky\": true"));
+    }
+
+    @Test
+    @Story("Product Defect Category")
+    @Severity(SeverityLevel.CRITICAL)
+    void shouldAppearInProductDefectCategory() {
+        fail("Business validation failed for order processing");
+    }
+
+    @Test
+    @Story("Test Defect Category")
+    @Severity(SeverityLevel.CRITICAL)
+    void shouldAppearInBrokenCategory() {
+        throw new NullPointerException("Framework setup failure");
     }
 
 }
