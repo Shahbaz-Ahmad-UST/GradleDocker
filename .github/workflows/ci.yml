@@ -55,6 +55,14 @@ jobs:
             -DDB_PASSWORD=rajasoN@0073
             -Dallure.results.directory=build/allure-results
 
+      - name: Verify Allure results were generated
+        run: |
+          if [ ! -d build/allure-results ] || [ -z "$(ls -A build/allure-results 2>/dev/null)" ]; then
+            echo "::error::build/allure-results is empty. Add 'testImplementation(\"io.qameta.allure:allure-junit5:\$allureVersion\")' to build.gradle.kts."
+            exit 1
+          fi
+          echo "Found $(ls build/allure-results | wc -l) files in allure-results"
+
       - name: Get previous Allure history
         uses: actions/checkout@v4
         if: always()
@@ -72,6 +80,14 @@ jobs:
           allure_report: allure-report
           keep_reports: 20
           gh_pages: gh-pages
+
+      - name: Verify Allure history was populated
+        run: |
+          if [ ! -d allure-history ] || [ -z "$(ls -A allure-history 2>/dev/null)" ]; then
+            echo "::error::allure-history is empty after report generation. Check the 'Build Allure report' step logs above."
+            exit 1
+          fi
+          echo "allure-history contains $(find allure-history -type f | wc -l) files"
 
       - name: Publish Allure report to GitHub Pages
         if: always()
