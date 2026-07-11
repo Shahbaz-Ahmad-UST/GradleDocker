@@ -54,7 +54,8 @@ dependencies {
     testImplementation("com.aventstack:extentreports:$extentVersion")
     testImplementation("tech.grasshopper:extentreports-cucumber7-adapter:$extentCucumberAdapterVersion")
 
-    testImplementation("org.slf4j:slf4j-simple:$slf4jVersion")
+//    testImplementation("org.slf4j:slf4j-simple:$slf4jVersion")
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.18")
 
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mysql")
@@ -87,8 +88,13 @@ tasks.withType<Test>().configureEach {
     systemProperty("build.label", System.getProperty("build.label", "local"))
     systemProperty("allure.results.directory", System.getProperty("allure.results.directory", "build/allure-results"))
 
+//    testLogging {
+//        events("passed", "skipped", "failed")
+//    }
+
     testLogging {
-        events("passed", "skipped", "failed")
+        events("passed", "failed", "skipped")
+        showStandardStreams = true
     }
 }
 
@@ -165,6 +171,16 @@ val allureReportInsightTest by tasks.registering(Test::class) {
     useProjectTestClasses()
 
     include("**/AllureReportInsightTest.class")
+    maxParallelForks = 1
+}
+
+val loggerTest by tasks.registering(Test::class) {
+    description = "Runs LoggerTest"
+    group = "verification"
+
+    useProjectTestClasses()
+
+    include("**/LoggerTest.class")
     maxParallelForks = 1
 }
 
