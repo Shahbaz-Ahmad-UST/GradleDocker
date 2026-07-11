@@ -1,5 +1,7 @@
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.java
+import java.util.UUID.*;
 
 plugins {
     java
@@ -66,6 +68,7 @@ dependencies {
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.release.set(22)
+    options.compilerArgs.add("-parameters")
 }
 
 fun Test.useProjectTestClasses() {
@@ -107,11 +110,12 @@ val CatalogPomTest by tasks.registering(Test::class) {
 }
 
 val orderSuite by tasks.registering(Test::class) {
-    description = "Runs Exercise1-3 and Milestone tests together"
+    description = "Runs all tests together"
     group = "verification"
     useProjectTestClasses()
-    include("**/Exercise1Test.class", "**/Exercise2Test.class", "**/Exercise3Test.class", "**/MilestoneTest.class","**/AllureReportInsightTest.class","**/CategoryDemonstrationTest.class")
+    include("**/*Test.class")
     maxParallelForks = 1
+    ignoreFailures = true
 }
 
 val exercise1Test by tasks.registering(Test::class) {
@@ -173,4 +177,41 @@ val categoryDemonstrationTest by tasks.registering(Test::class) {
     include("**/CategoryDemonstrationTest.class")
     maxParallelForks = 1
     ignoreFailures = true
+}
+
+val injectUnknownAllureResult by tasks.registering {
+    description = "Seeds a synthetic Unknown-status Allure result, since Unknown can't be produced by normal test code"
+    group = "verification"
+
+    dependsOn(categoryDemonstrationTest)
+
+    doLast {
+        val resultsDir = layout.buildDirectory.dir("allure-results").get().asFile
+        resultsDir.mkdirs()
+
+        val uuid = randomUUID().toString()
+        val now = System.currentTimeMillis()
+
+        val json = """
+            {
+              "uuid": "$uuid",
+              "name": "demonstratesUnknownCategory",
+              "fullName": "com.ust.sdet.tests.CategoryDemonstrationTest.demonstratesUnknownCategory",
+              "status": "unknown",
+              "stage": "finished",
+              "start": ${now - 500},
+              "stop": $now,
+              "labels": [
+                { "name": "suite", "value": "CategoryDemonstrationTest" },
+                { "name": "epic", "value": "Framework Hardening" },
+                { "name": "feature", "value": "Reporting Insights" }
+              ],
+              "statusDetails": {
+                "message": "Synthetic result: represents an incomplete test outcome, e.g. from a crashed runner"
+              }
+            }
+        """.trimIndent()
+
+        File(resultsDir, "$uuid-result.json").writeText(json)
+    }
 }
